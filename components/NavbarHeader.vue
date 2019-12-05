@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- AUTHENTICATED -->
-    <v-menu offset-y v-if="isAuthenticated">
+    <v-menu v-if="isAuthenticated" offset-y>
       <v-template v-slot:activator="{ on }">
         <v-btn v-on="on" text>
           {{ loggedInUser.username }}
@@ -31,11 +31,11 @@
     </v-menu>
 
     <!-- NOT AUTHENTICATED -->
-    <v-btn text to="/register" v-if="!isAuthenticated">
+    <v-btn v-if="!isAuthenticated" to="/register" text>
       <v-icon left>mdi-account-plus</v-icon>
       Register
     </v-btn>
-    <v-btn text to="/login" v-if="!isAuthenticated">
+    <v-btn v-if="!isAuthenticated" to="/login" text>
       <v-icon left>mdi-login-variant</v-icon>
       Log In
     </v-btn>
