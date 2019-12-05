@@ -26,7 +26,7 @@ export default {
   /*
    ** Global CSS
    */
-  css: [],
+  css: [{ src: '~static/css/rpg-awesome.min.css' }],
   /*
    ** Plugins to load before mounting the App
    */
