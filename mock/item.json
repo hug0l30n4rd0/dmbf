@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Weapon +1",
+    "type": 2,
+    "rarity": 3,
+    "attunement": true,
+    "cursed": true,
+    "image": null,
+    "description": "This weapon grants +1 to all attack and damage rolls.",
+    "source": null
+  },
+  {
+    "name": "Armor +1",
+    "type": 1,
+    "rarity": 3,
+    "attunement": false,
+    "cursed": false,
+    "image": null,
+    "description": "This armor grants +1 to the AC.",
+    "source": null
+  }
+]

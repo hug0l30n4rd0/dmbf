@@ -19,7 +19,7 @@
                 >
               </template>
               <v-card>
-                <v-form>
+                <v-form ref="form" v-model="valid">
                   <v-card-title>
                     <span class="headline">{{ formTitle }}</span>
                   </v-card-title>
@@ -29,27 +29,27 @@
                       <v-row>
                         <v-col cols="12" sm="6" md="8">
                           <v-text-field
+                            ref="name"
                             v-model="editedItem.name"
                             :rules="[rules.required]"
-                            name="name"
                             label="Name"
                             required
                           ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="4">
                           <v-switch
+                            ref="attunement"
                             v-model="editedItem.attunement"
-                            name="attunement"
                             class="ma-2"
                             label="Attunement"
                           ></v-switch>
                         </v-col>
                         <v-col cols="12" sm="6" md="4">
                           <v-select
+                            ref="type"
                             v-model="editedItem.type"
                             :rules="[rules.required]"
                             :items="types"
-                            name="type"
                             item-text="name"
                             return-object
                             label="Type"
@@ -57,10 +57,10 @@
                         </v-col>
                         <v-col cols="12" sm="6" md="4">
                           <v-select
+                            ref="rarity"
                             v-model="editedItem.rarity"
                             :rules="[rules.required]"
                             :items="rarities"
-                            name="rarity"
                             item-text="name"
                             return-object
                             label="Rarity"
@@ -68,6 +68,7 @@
                         </v-col>
                         <v-col cols="12" sm="6" md="4">
                           <v-switch
+                            ref="cursed"
                             v-model="editedItem.cursed"
                             class="ma-2"
                             label="Cursed"
@@ -75,10 +76,10 @@
                         </v-col>
                         <v-col cols="12" sm="6" md="12">
                           <v-textarea
+                            ref="description"
                             v-model="editedItem.description"
                             :rules="[rules.required]"
                             outlined
-                            name="description"
                             label="Description"
                             value=""
                           ></v-textarea>
@@ -99,17 +100,23 @@
             </v-dialog>
           </v-toolbar>
         </template>
+        <template v-slot:item.attunement="{ item }">
+          {{ item.attunement ? 'Yes' : 'No' }}
+        </template>
+        <template v-slot:item.cursed="{ item }">
+          {{ item.cursed ? 'Yes' : 'No' }}
+        </template>
         <template v-slot:item.action="{ item }">
           <v-icon @click="editItem(item)" small class="mr-2">
-            edit
+            mdi-pencil
           </v-icon>
           <v-icon @click="deleteItem(item)" small>
-            delete
+            mdi-delete
           </v-icon>
         </template>
 
         <template v-slot:no-data>
-          <v-btn @click="initialize" color="primary">Reset</v-btn>
+          Sorry, There is no data do display.
         </template>
       </v-data-table>
     </v-flex>
@@ -120,22 +127,24 @@
 // import axios from 'axios'
 // import ItemRarity from '@/model/ItemRarityMock.json'
 // import ItemType from '@/model/ItemTypeMock.json'
+// import { required, minLength } from 'vuelidate/lib/validators'
 
 export default {
   authenticated: true,
   data: () => ({
     rarity: null,
     rarities: [],
-    type: null,
+    type: '',
     types: [],
-    attunement: null,
-    cursed: null,
+    attunement: false,
+    cursed: false,
     dialog: false,
     headers: null,
     desserts: [],
     items: [],
     editedIndex: -1,
     formHasErrors: false,
+    valid: true,
     editedItem: {
       name: '',
       type: null,
@@ -144,19 +153,26 @@ export default {
       cursed: false,
       description: ''
     },
-    defaultItem: {
-      name: '',
-      type: null,
-      rarity: null,
-      attunement: false,
-      cursed: false,
-      description: ''
-    },
+    // defaultItem: {
+    //   name: '',
+    //   type: null,
+    //   rarity: null,
+    //   attunement: false,
+    //   cursed: false,
+    //   description: ''
+    // }
     rules: {
       required: (value) => !!value || 'Required.',
       counter: (value) => value.length <= 20 || 'Max 20 characters'
     }
   }),
+
+  // validations: {
+  //   name: {
+  //     required,
+  //     minLength: minLength(4)
+  //   }
+  // },
 
   computed: {
     formTitle() {
@@ -248,33 +264,24 @@ export default {
     },
 
     save() {
-      // this.formHasErrors = false
+      if (this.$refs.form.validate()) {
+        if (this.editedIndex > -1) {
+          Object.assign(this.items[this.editedIndex], this.editedItem)
+        } else {
+          console.log(JSON.stringify(this.editedItem))
 
-      // // console.log(Object.keys(this.form))
-      // Object.keys(this.form).forEach(f => {
-      //   //console.log(f + ' : ' + this.form[f])
-      //   if (this.form[f]==undefined || !this.form[f]) this.formHasErrors = true
-      //   console.log(this.$refs[f])
-      //   //this.$refs[f].validate(true)
-      // })
-
-      // console.log('@ formHasErrors: '+this.formHasErrors)
-
-      // if (!this.formHasErrors) {
-      if (this.editedIndex > -1) {
-        Object.assign(this.items[this.editedIndex], this.editedItem)
-      } else {
-        console.log(JSON.stringify(this.editedItem))
-
-        // this.$http.post('/item/', JSON.stringify(this.editedItem), {headers:{'Content-Type': 'application/json; charset=utf-8'}})
-        // .then(res => {
-        //   console.log('salvo com sucesso')
-        //   this.getData()
-        // })
-        // .catch((err) => console.log(err));
+          this.$http
+            .post('/item/', JSON.stringify(this.editedItem), {
+              headers: { 'Content-Type': 'application/json; charset=utf-8' }
+            })
+            .then((res) => {
+              console.log('salvo com sucesso')
+              this.getData()
+            })
+            .catch((err) => console.log(err))
+        }
+        this.close()
       }
-      // this.close()
-      // }
     }
 
     // validateForm() {

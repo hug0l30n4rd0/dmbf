@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Feat of Feats",
+    "prerequisite": "Requires nothing",
+    "source": "hugo.dasilva"
+  },
+  {
+    "name": "Feat Two",
+    "prerequisite": "Requires Two persons",
+    "source": "hugo.dasilva"
+  },
+  {
+    "name": "Some Feat",
+    "prerequisite": "Requires Str +13",
+    "source": "hugo.dasilva"
+  },
+  {
+    "name": "Feat of Fury",
+    "prerequisite": "Requires ability to rage.",
+    "source": "hugo.dasilva"
+  }
+]

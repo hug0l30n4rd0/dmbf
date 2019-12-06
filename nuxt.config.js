@@ -30,7 +30,7 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ['@/plugins/axios'],
+  plugins: ['@/plugins/axios', '@/plugins/vuelidate'],
   /*
    ** Nuxt.js dev-modules
    */
@@ -76,12 +76,19 @@ export default {
       themes: {
         light: {
           primary: colors.grey.darken3,
-          accent: colors.grey.lighten1,
+          accent: colors.lightBlue.darken3,
           secondary: colors.blueGrey.lighten2,
           info: colors.blueGrey.darken1,
           warning: colors.grey,
           error: colors.black,
           success: colors.blueGrey.lighten4
+          // primary: colors.red,
+          // accent: colors.blue,
+          // secondary: colors.yellow,
+          // info: colors.green,
+          // warning: colors.pink,
+          // error: colors.orange,
+          // success: colors.brown
         }
       }
     }
