@@ -79,6 +79,11 @@ export default {
           icon: 'ra ra-lightning-sword',
           title: 'Magic Items',
           to: '/items'
+        },
+        {
+          icon: 'ra ra-lightning-trio',
+          title: 'Spells',
+          to: '/spell'
         }
       ],
       miniVariant: false,

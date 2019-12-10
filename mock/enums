@@ -1,0 +1,39 @@
+************************** SCHOOL
+ABJURATION		(1,"Abjuration"),
+CONJURATION		(2,"Conjuration"),
+DIVINATION		(3,"Divination"),
+ENCHANTMENT		(4,"Enchantment"),
+EVOCATION		(5,"Evocation"),
+ILLUSION		(6,"illusion"),
+NECROMANCY		(7,"Necromancy"),
+TRANSMUTATION		(8,"Transmutation");
+
+************************** DURATION
+CONCENTRATION		(1,"Concentration"),
+INSTANTANEOUS		(2,"Instantaneous"),
+SPECIAL			(3,"Special"),
+TIME			(4,"Time"),
+UNTIL_DISPELLED		(5,"Until Dispelled"),
+DISPELL_OR_TRIGGER	(6,"Until Dispelled or Triggered");
+
+************************** DURATION TYPE
+ROUND	(1,"Round"),
+MINUTE	(2,"Minute"),
+HOUR	(3,"Hour"),
+DAY	(4,"Day");
+	
+************************** RANGE
+SELF		(1,"Self"),
+TOUCH		(2,"Touch"),
+RANGED		(3,"Ranged"),
+SIGHT		(4,"Sight"),
+UNLIMITED	(5,"Unlimited");
+
+************************** CASTING TIME
+ACTION			(1,"Action"),
+BONUS_ACTION		(2,"Bonus Action"),
+HOUR			(3,"Hour"),
+MINUTE			(4,"Minute"),
+NO_ACTION		(5,"No Action"),
+REACTION		(6,"Reaction"),
+SPECIAL			(7,"Special");
