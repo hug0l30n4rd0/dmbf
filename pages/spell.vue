@@ -7,8 +7,21 @@
         show-expand
         item-key="name"
         sort-by="name"
+        :loading="loading"
+        disable-pagination
+        hide-default-footer
         class="elevation-1"
       >
+        <template v-slot:progress class="text-center">
+          <v-progress-linear
+            color="blue-grey"
+            :height="8"
+            indeterminate
+          ></v-progress-linear>
+          <v-card class="d-flex pa-2 justify-center" row>
+            <div>Searching in the Spellbook...</div>
+          </v-card>
+        </template>
         <template v-slot:expanded-item="{ headers }">
           <td :colspan="headers.length">Peek-a-boo!</td>
         </template>
@@ -25,12 +38,58 @@
                 {{ item.castingValue }} {{ item.castingTime.name
                 }}{{ item.castingValue > 1 ? 's' : '' }}
               </td>
-              <td>{{ item.range }}</td>
-              <td>{{ item.duration }}</td>
-              <td class="text-center">{{ item.isVerbal ? 'Yes' : 'No' }}</td>
+              <td>{{ item.range.name }}</td>
+              <td>{{ item.duration ? item.duration.name : '' }}</td>
+              <!-- <td class="text-center">{{ item.isVerbal ? 'Yes' : 'No' }}</td>
               <td class="text-center">{{ item.isSomatic ? 'Yes' : 'No' }}</td>
               <td class="text-center">
                 {{ item.isMaterial ? 'Yes' : 'No' }}
+              </td> -->
+              <td class="text-center">
+                <v-chip
+                  class="ma-0"
+                  x-small
+                  :color="item.isSomatic ? 'blue-grey' : 'grey lighten-2'"
+                  text-color="white"
+                >
+                  <v-tooltip bottom eager>
+                    <template v-slot:activator="{ on }">
+                      <span v-on="on">S</span>
+                    </template>
+                    <span>Somatic</span>
+                  </v-tooltip>
+                </v-chip>
+                <v-chip
+                  class="ma-0"
+                  x-small
+                  :color="item.isVerbal ? 'blue-grey' : 'grey lighten-2'"
+                  text-color="white"
+                >
+                  <v-tooltip bottom eager>
+                    <template v-slot:activator="{ on }">
+                      <span v-on="on">V</span>
+                    </template>
+                    <span>Verbal</span>
+                  </v-tooltip>
+                </v-chip>
+                <v-chip
+                  class="ma-0"
+                  x-small
+                  :color="item.isMaterial ? 'blue-grey' : 'grey lighten-2'"
+                  text-color="white"
+                >
+                  <v-tooltip bottom eager>
+                    <template v-slot:activator="{ on }">
+                      <span v-on="on">M</span>
+                    </template>
+                    <span
+                      >Components{{
+                        item.isMaterial ? ': ' + item.components : ''
+                      }}</span
+                    >
+                  </v-tooltip>
+                  <!-- <span v-else>M</span> -->
+                </v-chip>
               </td>
               <td class="text-center">{{ item.isRitual ? 'Yes' : 'No' }}</td>
               <td class="text-center">
@@ -54,6 +113,7 @@
 export default {
   authenticated: true,
   data: () => ({
+    loading: true,
     expand: false,
     rarity: null,
     rarities: [],
@@ -122,9 +182,10 @@ export default {
         { text: 'Casting', value: 'castingTime.name', align: 'center' },
         { text: 'Range', value: 'range.name', align: 'center' },
         { text: 'Duration', value: 'duration.name', align: 'center' },
-        { text: 'Verbal', value: 'isVerbal', align: 'center' },
-        { text: 'Somatic', value: 'isSomatic', align: 'center' },
-        { text: 'Material', value: 'isMaterial', align: 'center' },
+        // { text: 'Verbal', value: 'isVerbal', align: 'center' },
+        // { text: 'Somatic', value: 'isSomatic', align: 'center' },
+        // { text: 'Material', value: 'isMaterial', align: 'center' },
+        { text: 'Components', value: 'isMaterial', align: 'center' },
         { text: 'Ritual', value: 'isRitual', align: 'center' },
         { text: 'Concentration', value: 'isConcentration', align: 'center' },
         { text: 'Source', value: 'source.name', align: 'center' },
@@ -148,6 +209,7 @@ export default {
       this.$http.get('/spell/').then((res) => {
         console.log(res)
         this.items = res.data._embedded.spell // data.content
+        this.loading = false
       })
     },
 
