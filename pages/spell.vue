@@ -96,7 +96,24 @@
                 {{ item.isConcentration ? 'Yes' : 'No' }}
               </td>
               <td class="text-xs-right">
-                {{ item.source.name }}
+                <v-chip
+                  class="ma-0"
+                  x-small
+                  :color="
+                    item.source.isOfficial ? 'blue-grey' : 'lime darken-4'
+                  "
+                  text-color="white"
+                >
+                  <v-tooltip bottom eager>
+                    <template v-slot:activator="{ on }">
+                      <span v-on="on">{{ item.source.shortName }}</span>
+                    </template>
+                    <span
+                      >{{ item.source.name }}, Page {{ item.sourcePage }}</span
+                    >
+                  </v-tooltip>
+                  <!-- <span v-else>M</span> -->
+                </v-chip>
               </td>
             </tr>
           </tbody>
