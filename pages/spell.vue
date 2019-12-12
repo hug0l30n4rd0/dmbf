@@ -5,13 +5,16 @@
         :headers="headers"
         :items="items"
         show-expand
-        item-key="name"
+        item-key="cod"
         sort-by="name"
         :loading="loading"
         disable-pagination
         hide-default-footer
         class="elevation-1"
       >
+        <!-- :footer-props="{
+          'items-per-page-options': [10, 20, 30, 40, 50]
+        }" -->
         <template v-slot:progress class="text-center">
           <v-progress-linear
             color="blue-grey"
@@ -27,7 +30,7 @@
         </template>
         <template v-slot:body="{ items }">
           <tbody>
-            <tr v-for="item in items" :key="item.name">
+            <tr v-for="item in items" :key="item.cod">
               <td>{{ item.id }}</td>
               <td class="text-left">{{ item.name }}</td>
               <td class="text-center">
@@ -38,82 +41,75 @@
                 {{ item.castingValue }} {{ item.castingTime.name
                 }}{{ item.castingValue > 1 ? 's' : '' }}
               </td>
-              <td>{{ item.range.name }}</td>
+              <td>
+                {{
+                  item.range.id == 3
+                    ? item.rangeDistance + ' ' + item.rangeMetric.name
+                    : item.range.name
+                }}
+              </td>
               <td>{{ item.duration ? item.duration.name : '' }}</td>
-              <!-- <td class="text-center">{{ item.isVerbal ? 'Yes' : 'No' }}</td>
-              <td class="text-center">{{ item.isSomatic ? 'Yes' : 'No' }}</td>
               <td class="text-center">
-                {{ item.isMaterial ? 'Yes' : 'No' }}
-              </td> -->
-              <td class="text-center">
-                <v-chip
-                  class="ma-0"
-                  x-small
-                  :color="item.isSomatic ? 'blue-grey' : 'grey lighten-2'"
-                  text-color="white"
-                >
-                  <v-tooltip bottom eager>
-                    <template v-slot:activator="{ on }">
-                      <span v-on="on">S</span>
-                    </template>
-                    <span>Somatic</span>
-                  </v-tooltip>
-                </v-chip>
-                <v-chip
-                  class="ma-0"
-                  x-small
-                  :color="item.isVerbal ? 'blue-grey' : 'grey lighten-2'"
-                  text-color="white"
-                >
-                  <v-tooltip bottom eager>
-                    <template v-slot:activator="{ on }">
-                      <span v-on="on">V</span>
-                    </template>
-                    <span>Verbal</span>
-                  </v-tooltip>
-                </v-chip>
-                <v-chip
-                  class="ma-0"
-                  x-small
-                  :color="item.isMaterial ? 'blue-grey' : 'grey lighten-2'"
-                  text-color="white"
-                >
-                  <v-tooltip bottom eager>
-                    <template v-slot:activator="{ on }">
-                      <span v-on="on">M</span>
-                    </template>
-                    <span
-                      >Components{{
-                        item.isMaterial ? ': ' + item.components : ''
-                      }}</span
-                    >
-                  </v-tooltip>
-                  <!-- <span v-else>M</span> -->
-                </v-chip>
+                <div class="tooltip">
+                  <span
+                    class="ma-0 v-chip theme--light v-size--x-small white--text"
+                    :class="item.isSomatic ? 'blue-grey' : 'grey lighten-2'"
+                  >
+                    <span class="v-chip__content">
+                      <span>S</span>
+                    </span>
+                  </span>
+                  <span class="tooltiptext">Somatic</span>
+                </div>
+
+                <div class="tooltip">
+                  <span
+                    class="ma-0 v-chip theme--light v-size--x-small white--text"
+                    :class="item.isVerbal ? 'blue-grey' : 'grey lighten-2'"
+                  >
+                    <span class="v-chip__content">
+                      <span>V</span>
+                    </span>
+                  </span>
+                  <span class="tooltiptext">Verbal</span>
+                </div>
+
+                <div class="tooltip">
+                  <span
+                    class="ma-0 v-chip theme--light v-size--x-small white--text"
+                    :class="item.isMaterial ? 'blue-grey' : 'grey lighten-2'"
+                  >
+                    <span class="v-chip__content">
+                      <span>M</span>
+                    </span>
+                  </span>
+                  <span class="tooltiptext"
+                    >Components{{
+                      item.isMaterial ? ': ' + item.components : ''
+                    }}</span
+                  >
+                </div>
               </td>
               <td class="text-center">{{ item.isRitual ? 'Yes' : 'No' }}</td>
               <td class="text-center">
                 {{ item.isConcentration ? 'Yes' : 'No' }}
               </td>
               <td class="text-xs-right">
-                <v-chip
-                  class="ma-0"
-                  x-small
-                  :color="
-                    item.source.isOfficial ? 'blue-grey' : 'lime darken-4'
-                  "
-                  text-color="white"
-                >
-                  <v-tooltip bottom eager>
-                    <template v-slot:activator="{ on }">
-                      <span v-on="on">{{ item.source.shortName }}</span>
-                    </template>
-                    <span
-                      >{{ item.source.name }}, Page {{ item.sourcePage }}</span
-                    >
-                  </v-tooltip>
-                  <!-- <span v-else>M</span> -->
-                </v-chip>
+                <div class="tooltip">
+                  <span
+                    class="ma-0 v-chip theme--light v-size--x-small white--text"
+                    :class="
+                      item.source.isOfficial ? 'blue-grey' : 'lime darken-4'
+                    "
+                  >
+                    <span class="v-chip__content">
+                      <span>{{ item.source.shortName }}</span>
+                    </span>
+                  </span>
+                  <span class="tooltiptext"
+                    >{{ item.source.name }}, Page {{ item.sourcePage }}</span
+                  >
+                </div>
               </td>
             </tr>
           </tbody>
@@ -225,7 +221,8 @@ export default {
     getData() {
       this.$http.get('/spell/').then((res) => {
         console.log(res)
-        this.items = res.data._embedded.spell // data.content
+        const returned = res.data._embedded.spell // data.content
+        this.items = Object.freeze(returned)
         this.loading = false
       })
     },
@@ -280,3 +277,35 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  /*border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  top: 100%;
+  left: 50%;
+  width: 240px;
+  margin-left: -120px;
+  background-color: rgba(0, 0, 0, 0.87);
+  color: #fff;
+  text-align: center;
+  padding: 5px 5px;
+  border-radius: 6px;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+</style>
