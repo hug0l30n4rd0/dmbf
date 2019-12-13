@@ -4,17 +4,14 @@
       <v-data-table
         :headers="headers"
         :items="items"
-        show-expand
         item-key="cod"
         sort-by="name"
         :loading="loading"
         disable-pagination
         hide-default-footer
+        show-expand
         class="elevation-1"
       >
-        <!-- :footer-props="{
-          'items-per-page-options': [10, 20, 30, 40, 50]
-        }" -->
         <template v-slot:progress class="text-center">
           <v-progress-linear
             color="blue-grey"
@@ -25,95 +22,127 @@
             <div>Searching in the Spellbook...</div>
           </v-card>
         </template>
-        <template v-slot:expanded-item="{ headers }">
-          <td :colspan="headers.length">Peek-a-boo!</td>
+        <template v-slot:expanded-item="{ headers, item }">
+          <td :colspan="headers.length">
+            <div
+              class="v-card v-sheet theme--light"
+              default="default"
+              subtitle="true"
+              supportingtext="true"
+            >
+              <!---->
+              <div class="v-card__title" style="background-color: #CCC;">
+                {{ item.name }}
+              </div>
+              <!-- <div class="v-card__subtitle">{{ item.school.name }}</div> -->
+              <div class="v-card__text">
+                <v-row>
+                  <v-col
+                    class="text-left"
+                    cols="2"
+                    style="background-color: #999;"
+                  >
+                    <!-- {{ item.name }} -->
+                    {{ item.school.name }}
+                    Level: <b>{{ item.level }}</b> <br />
+                    Casting time: <b>{{ item.level }}</b> <br />
+                    Range: <b>{{ item.level }}</b> <br />
+                    Components: <b>{{ item.level }}</b> <br />
+                    Duration: <b>{{ item.level }}</b> <br />
+                  </v-col>
+                  <v-col class="justify">
+                    {{ item.description }}
+                  </v-col>
+                </v-row>
+              </div>
+            </div>
+          </td>
         </template>
-        <template v-slot:body="{ items }">
-          <tbody>
-            <tr v-for="item in items" :key="item.cod">
-              <td>{{ item.id }}</td>
-              <td class="text-left">{{ item.name }}</td>
-              <td class="text-center">
-                {{ item.level == 0 ? 'Cantrip' : item.level }}
-              </td>
-              <td class="text-center">{{ item.school.name }}</td>
-              <td class="text-center">
-                {{ item.castingValue }} {{ item.castingTime.name
-                }}{{ item.castingValue > 1 ? 's' : '' }}
-              </td>
-              <td>
-                {{
-                  item.range.id == 3
-                    ? item.rangeDistance + ' ' + item.rangeMetric.name
-                    : item.range.name
-                }}
-              </td>
-              <td>{{ item.duration ? item.duration.name : '' }}</td>
-              <td class="text-center">
-                <div class="tooltip">
-                  <span
-                    class="ma-0 v-chip theme--light v-size--x-small white--text"
-                    :class="item.isSomatic ? 'blue-grey' : 'grey lighten-2'"
-                  >
-                    <span class="v-chip__content">
-                      <span>S</span>
-                    </span>
+        <template v-slot:item="{ item, expand, isExpanded }">
+          <tr @click="expand(!isExpanded)">
+            <td>{{ item.id }}</td>
+            <td class="text-left">{{ item.name }}</td>
+            <td class="text-center">
+              {{ item.level == 0 ? 'Cantrip' : item.level }}
+            </td>
+            <td class="text-center">{{ item.school.name }}</td>
+            <td class="text-center">
+              {{ item.castingValue }} {{ item.castingTime.name
+              }}{{ item.castingValue > 1 ? 's' : '' }}
+            </td>
+            <td>
+              {{
+                item.range.id == 3
+                  ? item.rangeDistance + ' ' + item.rangeMetric.name
+                  : item.range.name
+              }}
+            </td>
+            <td>{{ item.duration ? item.duration.name : '' }}</td>
+            <td class="text-center">
+              <div class="tooltip">
+                <span
+                  class="ma-0 v-chip theme--light v-size--x-small white--text"
+                  :class="item.isSomatic ? 'blue-grey' : 'grey lighten-2'"
+                >
+                  <span class="v-chip__content">
+                    <span>S</span>
                   </span>
-                  <span class="tooltiptext">Somatic</span>
-                </div>
+                </span>
+                <span class="tooltiptext">Somatic</span>
+              </div>
 
-                <div class="tooltip">
-                  <span
-                    class="ma-0 v-chip theme--light v-size--x-small white--text"
-                    :class="item.isVerbal ? 'blue-grey' : 'grey lighten-2'"
-                  >
-                    <span class="v-chip__content">
-                      <span>V</span>
-                    </span>
+              <div class="tooltip">
+                <span
+                  class="ma-0 v-chip theme--light v-size--x-small white--text"
+                  :class="item.isVerbal ? 'blue-grey' : 'grey lighten-2'"
+                >
+                  <span class="v-chip__content">
+                    <span>V</span>
                   </span>
-                  <span class="tooltiptext">Verbal</span>
-                </div>
+                </span>
+                <span class="tooltiptext">Verbal</span>
+              </div>
 
-                <div class="tooltip">
-                  <span
-                    class="ma-0 v-chip theme--light v-size--x-small white--text"
-                    :class="item.isMaterial ? 'blue-grey' : 'grey lighten-2'"
-                  >
-                    <span class="v-chip__content">
-                      <span>M</span>
-                    </span>
+              <div class="tooltip">
+                <span
+                  class="ma-0 v-chip theme--light v-size--x-small white--text"
+                  :class="item.isMaterial ? 'blue-grey' : 'grey lighten-2'"
+                >
+                  <span class="v-chip__content">
+                    <span>M</span>
                   </span>
-                  <span class="tooltiptext"
-                    >Components{{
-                      item.isMaterial ? ': ' + item.components : ''
-                    }}</span
-                  >
-                </div>
-              </td>
-              <td class="text-center">{{ item.isRitual ? 'Yes' : 'No' }}</td>
-              <td class="text-center">
-                {{ item.isConcentration ? 'Yes' : 'No' }}
-              </td>
-              <td class="text-xs-right">
-                <div class="tooltip">
-                  <span
-                    class="ma-0 v-chip theme--light v-size--x-small white--text"
-                    :class="
-                      item.source.isOfficial ? 'blue-grey' : 'lime darken-4'
-                    "
-                  >
-                    <span class="v-chip__content">
-                      <span>{{ item.source.shortName }}</span>
-                    </span>
+                </span>
+                <span class="tooltiptext"
+                  >Components{{
+                    item.isMaterial ? ': ' + item.components : ''
+                  }}</span
+                >
+              </div>
+            </td>
+            <td class="text-center">{{ item.isRitual ? 'Yes' : 'No' }}</td>
+            <td class="text-center">
+              {{ item.isConcentration ? 'Yes' : 'No' }}
+            </td>
+            <td class="text-xs-right">
+              <div class="tooltip">
+                <span
+                  class="ma-0 v-chip theme--light v-size--x-small white--text"
+                  :class="
+                    item.source.isOfficial ? 'blue-grey' : 'lime darken-4'
+                  "
+                >
+                  <span class="v-chip__content">
+                    <span>{{ item.source.shortName }}</span>
                   </span>
-                  <span class="tooltiptext"
-                    >{{ item.source.name }}, Page {{ item.sourcePage }}</span
-                  >
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </template>
+                </span>
+                <span class="tooltiptext"
+                  >{{ item.source.name }}, Page {{ item.sourcePage }}</span
+                >
+              </div>
+            </td>
+          </tr></template
+        >
+
         <template v-slot:no-data>
           Sorry, There is no data do display.
         </template>
