@@ -1,17 +1,185 @@
 <template>
   <v-layout>
     <v-flex class="text-center">
+      <v-expansion-panels color="grey">
+        <v-expansion-panel>
+          <v-expansion-panel-header><b>FILTERS</b></v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-row>
+              <v-col>
+                <v-text-field label="Name" v-model="filter.name"></v-text-field>
+              </v-col>
+              <v-col>
+                <v-select
+                  label="Level"
+                  :items="[
+                    { id: 0, name: 'Cantrip' },
+                    { id: 1, name: '1st' },
+                    { id: 2, name: '2nd' },
+                    { id: 3, name: '3rd' },
+                    { id: 4, name: '4th' },
+                    { id: 5, name: '5th' },
+                    { id: 6, name: '6th' },
+                    { id: 7, name: '7th' },
+                    { id: 8, name: '8th' },
+                    { id: 9, name: '9th' }
+                  ]"
+                  v-model="filter.selectedLevels"
+                  item-value="id"
+                  item-text="name"
+                  multiple
+                  chips
+                ></v-select>
+              </v-col>
+              <v-col>
+                <v-select
+                  label="School"
+                  :items="filter.schools"
+                  v-model="filter.selectedSchools"
+                  item-value="id"
+                  item-text="name"
+                  multiple
+                  chips
+                >
+                </v-select>
+              </v-col>
+              <v-col>
+                <v-select
+                  :items="filter.castingTimes"
+                  v-model="filter.selectedCastingTimes"
+                  label="Casting"
+                  item-value="id"
+                  item-text="name"
+                  multiple
+                  chips
+                ></v-select>
+              </v-col>
+              <v-col>
+                <v-select
+                  :items="filter.ranges"
+                  v-model="filter.selectedRanges"
+                  label="Range"
+                  item-value="id"
+                  item-text="name"
+                  multiple
+                  chips
+                ></v-select>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-select
+                  label="Class"
+                  item-text="name"
+                  multiple
+                  chips
+                  return-object
+                ></v-select>
+              </v-col>
+              <v-col>
+                <v-select
+                  :items="[
+                    { name: 'Yes', value: true },
+                    { name: 'No', value: false }
+                  ]"
+                  v-model="filter.verbal"
+                  label="Verbal"
+                  item-value="value"
+                  item-text="name"
+                  multiple
+                  chips
+                ></v-select>
+              </v-col>
+              <v-col>
+                <v-select
+                  :items="[
+                    { name: 'Yes', value: true },
+                    { name: 'No', value: false }
+                  ]"
+                  v-model="filter.somatic"
+                  label="Somatic"
+                  item-value="value"
+                  item-text="name"
+                  multiple
+                  chips
+                ></v-select>
+              </v-col>
+              <v-col>
+                <v-select
+                  :items="[
+                    { name: 'Yes', value: true },
+                    { name: 'No', value: false }
+                  ]"
+                  v-model="filter.material"
+                  label="Material"
+                  item-value="value"
+                  item-text="name"
+                  multiple
+                  chips
+                ></v-select>
+              </v-col>
+              <v-col>
+                <v-select
+                  :items="[
+                    { name: 'Yes', value: true },
+                    { name: 'No', value: false }
+                  ]"
+                  v-model="filter.ritual"
+                  label="Ritual"
+                  item-value="value"
+                  item-text="name"
+                  multiple
+                  chips
+                ></v-select>
+              </v-col>
+              <v-col>
+                <v-select
+                  :items="[
+                    { name: 'Yes', value: true },
+                    { name: 'No', value: false }
+                  ]"
+                  v-model="filter.concentration"
+                  label="Concentration"
+                  item-value="value"
+                  item-text="name"
+                  multiple
+                  chips
+                ></v-select>
+              </v-col>
+              <v-col>
+                <v-select
+                  :items="filter.sources"
+                  v-model="filter.selectedSources"
+                  label="Source"
+                  item-value="cod"
+                  item-text="name"
+                  multiple
+                  chips
+                ></v-select>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-btn color="default">Clear</v-btn>
+                <v-btn color="primary" @click="doFilter">Filter</v-btn>
+              </v-col>
+            </v-row>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
+
       <v-data-table
         :headers="headers"
-        :items="items"
+        :items="filter.items"
+        :loading="loading"
         item-key="cod"
         sort-by="name"
-        :loading="loading"
         disable-pagination
         hide-default-footer
         show-expand
         class="elevation-1"
       >
+        <!-- Progress -->
         <template v-slot:progress class="text-center">
           <v-progress-linear
             color="blue-grey"
@@ -22,7 +190,10 @@
             <div>Searching in the Spellbook...</div>
           </v-card>
         </template>
+
+        <!-- Expanded Card -->
         <template v-slot:expanded-item="{ headers, item }">
+          <!-- Full Width-->
           <td :colspan="headers.length">
             <div
               class="v-card v-sheet theme--light"
@@ -30,27 +201,39 @@
               subtitle="true"
               supportingtext="true"
             >
-              <!---->
               <div class="v-card__title" style="background-color: #CCC;">
                 {{ item.name }}
               </div>
-              <!-- <div class="v-card__subtitle">{{ item.school.name }}</div> -->
               <div class="v-card__text">
                 <v-row>
                   <v-col
-                    class="text-left"
-                    cols="2"
-                    style="background-color: #999;"
+                    class="text-l
+            i.school.id === this.filterSchools.idy.breakpoint.smAndUp"
                   >
-                    <!-- {{ item.name }} -->
-                    {{ item.school.name }}
-                    Level: <b>{{ item.level }}</b> <br />
-                    Casting time: <b>{{ item.level }}</b> <br />
-                    Range: <b>{{ item.level }}</b> <br />
-                    Components: <b>{{ item.level }}</b> <br />
+                    <b>{{ item.school.name }}</b> <br />
+                    Level: <b>{{ displayLevel(item.level) }}</b> <br />
+                    Casting time:
+                    <b>{{ displayCasting(item) }}</b>
+                    <br />
+                    Range:
+                    <b>{{ displayRange(item) }}</b>
+                    <br />
+
                     Duration: <b>{{ item.level }}</b> <br />
                   </v-col>
-                  <v-col class="justify">
+                  <v-col class="text-justify">
+                    <div v-if="$vuetify.breakpoint.xs">
+                      Casting: <b>{{ displayCasting(item) }}</b
+                      >, Range: <b>{{ displayRange(item) }}</b
+                      ><span v-if="item.duration"
+                        >, Duration:
+                        <b>{{ item.duration ? item.duration.name : '' }}</b>
+                      </span>
+                      <br />
+                    </div>
+                    Components: <b>{{ displayComponents(item) }}</b> <br />
+                    <hr />
+                    <br />
                     {{ item.description }}
                   </v-col>
                 </v-row>
@@ -58,39 +241,66 @@
             </div>
           </td>
         </template>
-        <template v-slot:item="{ item, expand, isExpanded }">
-          <tr @click="expand(!isExpanded)">
-            <td>{{ item.id }}</td>
-            <td class="text-left">{{ item.name }}</td>
-            <td class="text-center">
-              {{ item.level == 0 ? 'Cantrip' : item.level }}
-            </td>
-            <td class="text-center">{{ item.school.name }}</td>
-            <td class="text-center">
-              {{ item.castingValue }} {{ item.castingTime.name
-              }}{{ item.castingValue > 1 ? 's' : '' }}
-            </td>
-            <td>
-              {{
-                item.range.id == 3
-                  ? item.rangeDistance + ' ' + item.rangeMetric.name
-                  : item.range.name
-              }}
-            </td>
-            <td>{{ item.duration ? item.duration.name : '' }}</td>
-            <td class="text-center">
-              <div class="tooltip">
-                <span
-                  class="ma-0 v-chip theme--light v-size--x-small white--text"
-                  :class="item.isSomatic ? 'blue-grey' : 'grey lighten-2'"
-                >
-                  <span class="v-chip__content">
-                    <span>S</span>
-                  </span>
-                </span>
-                <span class="tooltiptext">Somatic</span>
-              </div>
 
+        <!-- The Table -->
+        <template v-slot:item="{ item, expand, isExpanded }">
+          <tr @click="expand(!isExpanded)" style="cursor: pointer;">
+            <td
+              class="text-center d-block d-sm-table-cell"
+              v-if="$vuetify.breakpoint.smAndUp"
+            ></td>
+            <td
+              class="text-left d-block d-sm-table-cell"
+              :class="{
+                'text-center': $vuetify.breakpoint.xs
+              }"
+            >
+              <div v-if="$vuetify.breakpoint.xs">
+                <span class="font-weight-black text-uppercase">{{
+                  item.name
+                }}</span>
+                <br />
+                <span>
+                  {{ item.school.name }}, {{ displayLevel(item.level) }}</span
+                >
+                <br />
+              </div>
+              <span v-else>{{ item.name }}</span>
+            </td>
+            <td
+              class="text-center d-block d-sm-table-cell"
+              v-if="$vuetify.breakpoint.smAndUp"
+            >
+              <span>{{ displayLevel(item.level) }}</span>
+            </td>
+            <td
+              class="text-center d-block d-sm-table-cell"
+              v-if="$vuetify.breakpoint.smAndUp"
+            >
+              {{ item.school.name }}
+            </td>
+            <td
+              class="text-center d-block d-sm-table-cell"
+              v-if="$vuetify.breakpoint.smAndUp"
+            >
+              {{ displayCasting(item) }}
+            </td>
+            <td
+              class="d-block d-sm-table-cell"
+              v-if="$vuetify.breakpoint.smAndUp"
+            >
+              {{ displayRange(item) }}
+            </td>
+            <td
+              class="d-block d-sm-table-cell"
+              v-if="$vuetify.breakpoint.smAndUp"
+            >
+              {{ item.duration ? item.duration.name : '' }}
+            </td>
+            <td
+              class="text-center d-block d-sm-table-cell"
+              v-if="$vuetify.breakpoint.smAndUp"
+            >
               <div class="tooltip">
                 <span
                   class="ma-0 v-chip theme--light v-size--x-small white--text"
@@ -101,6 +311,18 @@
                   </span>
                 </span>
                 <span class="tooltiptext">Verbal</span>
+              </div>
+
+              <div class="tooltip">
+                <span
+                  class="ma-0 v-chip theme--light v-size--x-small white--text"
+                  :class="item.isSomatic ? 'blue-grey' : 'grey lighten-2'"
+                >
+                  <span class="v-chip__content">
+                    <span>S</span>
+                  </span>
+                </span>
+                <span class="tooltiptext">Somatic</span>
               </div>
 
               <div class="tooltip">
@@ -119,11 +341,22 @@
                 >
               </div>
             </td>
-            <td class="text-center">{{ item.isRitual ? 'Yes' : 'No' }}</td>
-            <td class="text-center">
+            <td
+              class="text-center d-block d-sm-table-cell"
+              v-if="$vuetify.breakpoint.smAndUp"
+            >
+              {{ item.isRitual ? 'Yes' : 'No' }}
+            </td>
+            <td
+              class="text-center d-block d-sm-table-cell"
+              v-if="$vuetify.breakpoint.smAndUp"
+            >
               {{ item.isConcentration ? 'Yes' : 'No' }}
             </td>
-            <td class="text-xs-right">
+            <td
+              class="text-xs-right d-block d-sm-table-cell"
+              v-if="$vuetify.breakpoint.smAndUp"
+            >
               <div class="tooltip">
                 <span
                   class="ma-0 v-chip theme--light v-size--x-small white--text"
@@ -140,8 +373,8 @@
                 >
               </div>
             </td>
-          </tr></template
-        >
+          </tr>
+        </template>
 
         <template v-slot:no-data>
           Sorry, There is no data do display.
@@ -165,13 +398,30 @@ export default {
     cursed: false,
     dialog: false,
     headers: null,
-    desserts: [],
     items: [],
-    editedIndex: -1,
-    formHasErrors: false,
-    valid: true,
-    editedItem: {
+    filter: {
+      items: [],
       name: '',
+      verbal: [],
+      somatic: [],
+      material: [],
+      ritual: [],
+      concentration: [],
+      selectedLevels: [],
+      sources: [],
+      selectedSources: [],
+      castingTimes: [],
+      selectedCastingTimes: [],
+      durations: [],
+      selectedDurations: [],
+      durationTypes: [],
+      selectedDurationTypes: [],
+      ranges: [],
+      selectedRanges: [],
+      schools: [],
+      selectedSchools: []
+    },
+    editedItem: {
       type: null,
       rarity: null,
       attunement: false,
@@ -190,8 +440,6 @@ export default {
     },
     form() {
       return {
-        name: this.name,
-        attunement: this.attunement,
         cursed: this.cursed,
         type: this.type,
         rarity: this.rarity,
@@ -224,9 +472,6 @@ export default {
         { text: 'Casting', value: 'castingTime.name', align: 'center' },
         { text: 'Range', value: 'range.name', align: 'center' },
         { text: 'Duration', value: 'duration.name', align: 'center' },
-        // { text: 'Verbal', value: 'isVerbal', align: 'center' },
-        // { text: 'Somatic', value: 'isSomatic', align: 'center' },
-        // { text: 'Material', value: 'isMaterial', align: 'center' },
         { text: 'Components', value: 'isMaterial', align: 'center' },
         { text: 'Ritual', value: 'isRitual', align: 'center' },
         { text: 'Concentration', value: 'isConcentration', align: 'center' },
@@ -235,15 +480,45 @@ export default {
       ]
     },
 
-    getItemTypes() {
-      this.$http.get('/resource/item-type/').then((res) => {
-        this.types = res.data
-      })
+    initialize() {
+      this.getSources()
+      this.getSpellCastingTimes()
+      this.getSpellDurations()
+      this.getSpellDurationTypes()
+      this.getSpellRanges()
+      this.getSpellSchools()
+      this.getData()
+      this.headers = this.getHeaders()
     },
 
-    getItemRarities() {
-      this.$http.get('/resource/item-rarity/').then((res) => {
-        this.rarities = res.data
+    getSources() {
+      this.$http.get('/source/').then((res) => {
+        this.filter.sources = res.data._embedded.source
+      })
+    },
+    getSpellCastingTimes() {
+      this.$http.get('/resource/spell-casting-time/').then((res) => {
+        this.filter.castingTimes = res.data
+      })
+    },
+    getSpellDurations() {
+      this.$http.get('/resource/spell-duration/').then((res) => {
+        this.filter.durations = res.data
+      })
+    },
+    getSpellDurationTypes() {
+      this.$http.get('/resource/spell-duration-type/').then((res) => {
+        this.filter.durationTypes = res.data
+      })
+    },
+    getSpellRanges() {
+      this.$http.get('/resourverbalce/spell-range/').then((res) => {
+        this.filter.ranges = res.data
+      })
+    },
+    getSpellSchools() {
+      this.$http.get('/resource/spell-school/').then((res) => {
+        this.filter.schools = res.data
       })
     },
 
@@ -252,15 +527,9 @@ export default {
         console.log(res)
         const returned = res.data._embedded.spell // data.content
         this.items = Object.freeze(returned)
+        this.filter.items = this.items
         this.loading = false
       })
-    },
-
-    initialize() {
-      this.getItemTypes()
-      this.getItemRarities()
-      this.getData()
-      this.headers = this.getHeaders()
     },
 
     editItem(item) {
@@ -302,6 +571,114 @@ export default {
         }
         this.close()
       }
+    },
+
+    doFilter() {
+      this.filter.items = this.items.filter((i) => {
+        // console.log('castTime: ' + i.castingTime.id)
+        return (
+          (!this.filter.name ||
+            i.name.toLowerCase().includes(this.filter.name)) &&
+          (this.filter.selectedLevels.length === 0 ||
+            this.filter.selectedLevels.filter((schoolLvl) => {
+              return schoolLvl === i.level
+            }).length > 0) &&
+          (this.filter.selectedSchools.length === 0 ||
+            this.filter.selectedSchools.filter((schoolId) => {
+              return schoolId === i.school.id
+            }).length > 0) &&
+          (this.filter.selectedCastingTimes.length === 0 ||
+            this.filter.selectedCastingTimes.filter((castingId) => {
+              return castingId === i.castingTime.id
+            }).length > 0) &&
+          (this.filter.selectedRanges.length === 0 ||
+            this.filter.selectedRanges.filter((rangeId) => {
+              return rangeId === i.range.id
+            }).length > 0) &&
+          (this.filter.verbal.length === 0 ||
+            this.filter.verbal.length === 2 ||
+            this.filter.verbal[0] === i.isVerbal) &&
+          (this.filter.somatic.length === 0 ||
+            this.filter.somatic.length === 2 ||
+            this.filter.somatic[0] === i.isSomatic) &&
+          (this.filter.material.length === 0 ||
+            this.filter.material.length === 2 ||
+            this.filter.material[0] === i.isMaterial) &&
+          (this.filter.concentration.length === 0 ||
+            this.filter.concentration.length === 2 ||
+            this.filter.concentration[0] === i.isConcentration) &&
+          (this.filter.ritual.length === 0 ||
+            this.filter.ritual.length === 2 ||
+            this.filter.ritual[0] === i.isRitual) &&
+          (this.filter.selectedSources.length === 0 ||
+            this.filter.selectedSources.filter((sourceId) => {
+              return sourceId === i.source.cod
+            }).length > 0)
+        )
+      })
+    },
+
+    displayLevel(level) {
+      if (level === 0) {
+        return 'Cantrip'
+      } else if (level === 1) {
+        return '1st Level'
+      } else if (level === 2) {
+        return '2nd Level'
+      } else if (level === 3) {
+        return '3rd Level'
+      } else {
+        return level + 'th Level'
+      }
+    },
+
+    displayCasting(item) {
+      let retorno = ''
+      if (item.castingValue > 1) {
+        retorno = item.castingValue
+      }
+      retorno += item.castingTime.name
+      if (item.castingValue > 1) {
+        retorno += 's'
+      }
+      return retorno
+    },
+
+    displayRange(item) {
+      let retorno = ''
+      if (item.range.id === 3) {
+        retorno = item.rangeDistance + ' ' + item.rangeMetric.name
+      } else {
+        retorno = item.range.name
+      }
+      return retorno
+    },
+
+    displayComponents(item) {
+      let retorno = ''
+      let appendComma = false
+      if (item.isVerbal) {
+        appendComma = true
+        retorno += 'V'
+      }
+      if (item.isSomatic) {
+        appendComma = true
+        if (appendComma) {
+          retorno += ', '
+        }
+        retorno += 'S'
+      }
+      if (item.isMaterial) {
+        appendComma = true
+        if (appendComma) {
+          retorno += ', '
+        }
+        retorno += 'M'
+        if (item.components) {
+          retorno += ' (' + item.components + ')'
+        }
+      }
+      return retorno
     }
   }
 }
@@ -336,5 +713,9 @@ export default {
 /* Show the tooltip text when you mouse over the tooltip container */
 .tooltip:hover .tooltiptext {
   visibility: visible;
+}
+
+.v-expansion-panel {
+  background-color: #eeeeee !important;
 }
 </style>
