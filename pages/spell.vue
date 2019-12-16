@@ -105,7 +105,7 @@
                 ></v-select>
               </v-col>
               <v-col>
-                <v-select
+                <!-- <v-select
                   :items="[
                     { name: 'Yes', value: true },
                     { name: 'No', value: false }
@@ -116,7 +116,22 @@
                   item-text="name"
                   multiple
                   chips
-                ></v-select>
+                ></v-select> -->
+                <v-btn-toggle
+                  v-model="filter.material"
+                  mandatory
+                  label="Material"
+                >
+                  <v-btn :value="false" flat>
+                    No
+                  </v-btn>
+                  <v-btn :value="null" flat>
+                    Any
+                  </v-btn>
+                  <v-btn :value="true" flat>
+                    Yes
+                  </v-btn>
+                </v-btn-toggle>
               </v-col>
               <v-col>
                 <v-select
@@ -141,6 +156,8 @@
                   v-model="filter.concentration"
                   label="Concentration"
                   item-value="value"
+                  stallone
+                  idae
                   item-text="name"
                   multiple
                   chips
@@ -185,10 +202,10 @@
             <v-toolbar-title>My CRUD</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
-            <v-dialog v-model="dialog" max-width="500px">
+            <v-dialog v-model="dialog" max-width="1024">
               <template v-slot:activator="{ on }">
                 <v-btn color="primary" dark class="mb-2" v-on="on"
-                  >New Item</v-btn
+                  >New Spell</v-btn
                 >
               </template>
               <v-card>
@@ -201,33 +218,156 @@
                     <v-row>
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
+                          :rules="[rules.required]"
                           v-model="editedItem.name"
-                          label="Dessert name"
+                          label="Name"
                         ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="2">
+                        <v-select
+                          label="Level"
+                          :items="[
+                            { id: 0, name: 'Cantrip' },
+                            { id: 1, name: '1st' },
+                            { id: 2, name: '2nd' },
+                            { id: 3, name: '3rd' },
+                            { id: 4, name: '4th' },
+                            { id: 5, name: '5th' },
+                            { id: 6, name: '6th' },
+                            { id: 7, name: '7th' },
+                            { id: 8, name: '8th' },
+                            { id: 9, name: '9th' }
+                          ]"
+                          :rules="[rules.required]"
+                          v-model="editedItem.level"
+                          item-value="id"
+                          item-text="name"
+                        ></v-select>
+                      </v-col>
+                      <v-col ols="12" sm="6" md="4">
+                        <v-select
+                          label="School"
+                          :items="filter.schools"
+                          :rules="[rules.required]"
+                          v-model="editedItem.school"
+                          item-value="id"
+                          item-text="name"
+                        >
+                        </v-select>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="2">
+                        <v-switch
+                          v-model="editedItem.isConcentration"
+                          label="Concentration"
+                        />
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col cols="12" sm="6" md="4" class="d-flex flex-row">
+                        <v-text-field
+                          v-model="editedItem.castingValue"
+                          label="Casting Time"
+                        ></v-text-field>
+                        <v-select
+                          :items="filter.castingTimes"
+                          :rules="[rules.required]"
+                          v-model="editedItem.castingTimes"
+                          item-value="id"
+                          item-text="name"
+                          class="ml-2"
+                        >
+                        </v-select>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4" class="d-flex flex-row">
+                        <v-select
+                          label="Range"
+                          :items="filter.ranges"
+                          :rules="[rules.required]"
+                          v-model="editedItem.range"
+                          item-value="id"
+                          item-text="name"
+                          class="mr-2"
+                        >
+                        </v-select>
+                        <v-text-field
+                          label="Distance (ft.)"
+                          v-model="editedItem.rangeDistance"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4" class="d-flex flex-row">
+                        <v-select
+                          label="Duration"
+                          :items="filter.durations"
+                          :rules="[rules.required]"
+                          v-model="editedItem.duration"
+                          item-value="id"
+                          item-text="name"
+                          class="mr-2"
+                        >
+                        </v-select>
+                        <v-text-field
+                          v-model="editedItem.durationValue"
+                        ></v-text-field>
+                        <v-select
+                          :items="filter.durationTypes"
+                          :rules="[rules.required]"
+                          v-model="editedItem.durationType"
+                          item-value="id"
+                          item-text="name"
+                          class="ml-2"
+                        >
+                        </v-select>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col cols="12" sm="6" md="3">
+                        <p>Components</p>
+                        <v-btn-toggle dense multiple>
+                          <v-btn
+                            @click="editedItem.isVisual = !editedItem.isVisual"
+                            class="groupSearchType"
+                            >V</v-btn
+                          >
+                          <v-btn
+                            @click="
+                              editedItem.isSomatic = !editedItem.isSomatic
+                            "
+                            class="groupSearchType"
+                            >S</v-btn
+                          >
+                          <v-btn
+                            @click="
+                              editedItem.isMaterial = !editedItem.isMaterial
+                            "
+                            class="groupSearchType"
+                            >M</v-btn
+                          >
+                        </v-btn-toggle>
                       </v-col>
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
-                          v-model="editedItem.calories"
-                          label="Calories"
+                          v-model="editedItem.components"
+                          :disabled="!editedItem.isMaterial"
+                          label="Material Component Description"
                         ></v-text-field>
                       </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.fat"
-                          label="Fat (g)"
-                        ></v-text-field>
+                      <v-col cols="12" sm="6" md="2">
+                        <v-switch
+                          v-model="editedItem.isRitual"
+                          label="Ritual"
+                        />
                       </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.carbs"
-                          label="Carbs (g)"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.protein"
-                          label="Protein (g)"
-                        ></v-text-field>
+                    </v-row>
+                    <v-row>
+                      <v-col cols="12" sm="6" md="12">
+                        <v-textarea
+                          ref="description"
+                          v-model="editedItem.description"
+                          :rules="[rules.required]"
+                          outlined
+                          label="Description"
+                          value=""
+                        ></v-textarea>
                       </v-col>
                     </v-row>
                   </v-container>
@@ -454,6 +594,7 @@
 export default {
   authenticated: true,
   data: () => ({
+    editedIndex: -1,
     loading: true,
     expand: false,
     rarity: null,
@@ -488,10 +629,25 @@ export default {
       selectedSchools: []
     },
     editedItem: {
-      type: null,
-      rarity: null,
-      attunement: false,
-      cursed: false,
+      name: '',
+      level: null,
+      school: null,
+      isConcentration: false,
+      isRitual: false,
+      castingValu: '',
+      castingTime: null,
+      range: null,
+      rangeDistance: '',
+      rangeMetric: null,
+      duration: null,
+      durationValue: null,
+      durationType: null,
+      isVerbal: false,
+      isSomatic: false,
+      isMaterial: false,
+      components: '',
+      source: null,
+      sourcePage: null,
       description: ''
     },
     rules: {
@@ -502,7 +658,7 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      return this.editedIndex === -1 ? 'New Spell' : 'Edit Spell'
     },
     form() {
       return {
@@ -783,5 +939,9 @@ export default {
 
 .v-expansion-panel {
   background-color: #eeeeee !important;
+}
+
+.v-btn--active {
+  background-color: blue-grey !important;
 }
 </style>
