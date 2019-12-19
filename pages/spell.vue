@@ -256,13 +256,19 @@
                           >
                           </v-select>
                         </v-col>
-                        <v-col cols="12" sm="6" md="2">
+                        <v-col cols="12" sm="6" md="2" class="d-block">
                           <v-switch
                             v-model="editedItem.isConcentration"
                             label="Concentration"
                           />
+                          <v-switch
+                            v-model="editedItem.isRitual"
+                            label="Ritual"
+                            class="m"
+                          />
                         </v-col>
                       </v-row>
+
                       <v-row>
                         <v-col cols="12" sm="6" md="4" class="d-flex flex-row">
                           <v-text-field
@@ -337,6 +343,7 @@
                           </v-select>
                         </v-col>
                       </v-row>
+
                       <v-row>
                         <v-col cols="12" sm="6" md="3">
                           <p>Components</p>
@@ -371,11 +378,23 @@
                             label="Material Component Description"
                           ></v-text-field>
                         </v-col>
-                        <v-col cols="12" sm="6" md="2">
-                          <v-switch
-                            v-model="editedItem.isRitual"
-                            label="Ritual"
-                          />
+
+                        <v-col cols="12" sm="6" md="4" class="d-flex flex-row">
+                          <v-select
+                            label="Source"
+                            :items="filter.sources"
+                            :rules="[rules.required]"
+                            v-model="editedItem.source"
+                            item-value="id"
+                            item-text="name"
+                            class="mr-2"
+                          ></v-select>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="1" class="d-flex flex-row">
+                          <v-text-field
+                            label="Page"
+                            v-model="editedItem.sourcePage"
+                          ></v-text-field>
                         </v-col>
                       </v-row>
                       <v-row>
