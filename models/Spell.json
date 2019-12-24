@@ -1,0 +1,22 @@
+{
+  "name": "",
+  "level": 0,
+  "school": 1,
+  "isConcentration": false,
+  "isRitual": false,
+  "castingValue": null,
+  "castingTime": 1,
+  "range": 1,
+  "rangeDistance": null,
+  "rangeMetric": 1,
+  "duration": 1,
+  "durationValue": null,
+  "durationType": null,
+  "isVerbal": false,
+  "isSomatic": false,
+  "isMaterial": false,
+  "components": "",
+  "source": 0,
+  "sourcePage": null,
+  "description": ""
+}
