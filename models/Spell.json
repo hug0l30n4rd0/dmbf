@@ -2,6 +2,7 @@
   "name": "",
   "level": 0,
   "school": 1,
+  "gameClasses": [],
   "isConcentration": false,
   "isRitual": false,
   "castingValue": null,
@@ -19,4 +20,5 @@
   "source": 0,
   "sourcePage": null,
   "description": ""
+
 }

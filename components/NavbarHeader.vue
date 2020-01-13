@@ -31,11 +31,11 @@
     </v-menu>
 
     <!-- NOT AUTHENTICATED -->
-    <v-btn v-if="!isAuthenticated" to="/register" text>
+    <v-btn v-if="!isAuthenticated" :disabled="true" to="/register" text>
       <v-icon left>mdi-account-plus</v-icon>
       Register
     </v-btn>
-    <v-btn v-if="!isAuthenticated" to="/login" text>
+    <v-btn v-if="!isAuthenticated" :disabled="true" to="/login" text>
       <v-icon left>mdi-login-variant</v-icon>
       Log In
     </v-btn>

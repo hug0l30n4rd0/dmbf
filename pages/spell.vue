@@ -3,15 +3,16 @@
     <v-flex class="text-center">
       <v-expansion-panels color="grey">
         <v-expansion-panel>
-          <v-expansion-panel-header><b>FILTERS</b></v-expansion-panel-header>
+          <v-expansion-panel-header>
+            <b>FILTERS</b>
+          </v-expansion-panel-header>
           <v-expansion-panel-content>
             <v-row>
               <v-col>
-                <v-text-field label="Name" v-model="filter.name"></v-text-field>
+                <v-text-field v-model="filter.name" label="Name"></v-text-field>
               </v-col>
               <v-col>
                 <v-select
-                  label="Level"
                   :items="[
                     { id: 0, name: 'Cantrip' },
                     { id: 1, name: '1st' },
@@ -25,6 +26,7 @@
                     { id: 9, name: '9th' }
                   ]"
                   v-model="filter.selectedLevels"
+                  label="Level"
                   item-value="id"
                   item-text="name"
                   multiple
@@ -33,15 +35,14 @@
               </v-col>
               <v-col>
                 <v-select
-                  label="School"
                   :items="filter.schools"
                   v-model="filter.selectedSchools"
+                  label="School"
                   item-value="id"
                   item-text="name"
                   multiple
                   chips
-                >
-                </v-select>
+                ></v-select>
               </v-col>
               <v-col>
                 <v-select
@@ -105,7 +106,7 @@
                 ></v-select>
               </v-col>
               <v-col>
-                <!-- <v-select
+                <v-select
                   :items="[
                     { name: 'Yes', value: true },
                     { name: 'No', value: false }
@@ -116,22 +117,16 @@
                   item-text="name"
                   multiple
                   chips
-                ></v-select> -->
-                <v-btn-toggle
+                ></v-select>
+                <!-- <v-btn-toggle
                   v-model="filter.material"
                   mandatory
                   label="Material"
                 >
-                  <v-btn :value="false" flat>
-                    No
-                  </v-btn>
-                  <v-btn :value="null" flat>
-                    Any
-                  </v-btn>
-                  <v-btn :value="true" flat>
-                    Yes
-                  </v-btn>
-                </v-btn-toggle>
+                  <v-btn :value="false" flat>No</v-btn>
+                  <v-btn :value="null" flat>Any</v-btn>
+                  <v-btn :value="true" flat>Yes</v-btn>
+                </v-btn-toggle> -->
               </v-col>
               <v-col>
                 <v-select
@@ -178,7 +173,7 @@
             <v-row>
               <v-col>
                 <v-btn color="default">Clear</v-btn>
-                <v-btn color="primary" @click="doFilter">Filter</v-btn>
+                <v-btn @click="doFilter" color="primary">Filter</v-btn>
               </v-col>
             </v-row>
           </v-expansion-panel-content>
@@ -189,7 +184,7 @@
         :headers="headers"
         :items="filter.items"
         :loading="loading"
-        item-key="cod"
+        item-key="id"
         sort-by="name"
         disable-pagination
         hide-default-footer
@@ -199,16 +194,25 @@
         <!-- CRUD Modal -->
         <template v-slot:top>
           <v-toolbar flat color="white">
-            <v-toolbar-title>My CRUD</v-toolbar-title>
+            <v-toolbar-title>D&D 5e - Spells</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
             <v-dialog v-model="dialog" max-width="1024">
               <template v-slot:activator="{ on }">
-                <v-btn color="primary" dark class="mb-2" v-on="on"
+                <v-btn v-on="on" color="primary" dark class="mb-2"
                   >New Spell</v-btn
                 >
               </template>
-              <SpellModal></SpellModal>
+              <SpellModal
+                :schools="filter.schools"
+                :castingTimes="filter.castingTimes"
+                :ranges="filter.ranges"
+                :durations="filter.durations"
+                :durationTypes="filter.durationTypes"
+                :sources="filter.sources"
+                :gameClasses="filter.gameClasses"
+                @update-show-modal="updateSpellModalShow"
+              ></SpellModal>
             </v-dialog>
           </v-toolbar>
         </template>
@@ -216,8 +220,8 @@
         <!-- Progress -->
         <template v-slot:progress class="text-center">
           <v-progress-linear
-            color="blue-grey"
             :height="8"
+            color="blue-grey"
             indeterminate
           ></v-progress-linear>
           <v-card class="d-flex pa-2 justify-center" row>
@@ -240,32 +244,36 @@
               </div>
               <div class="v-card__text">
                 <v-row>
-                  <v-col
-                    class="text-l
-            i.school.id === this.filterSchools.idy.breakpoint.smAndUp"
-                  >
-                    <b>{{ item.school.name }}</b> <br />
-                    Level: <b>{{ displayLevel(item.level) }}</b> <br />
-                    Casting time:
+                  <v-col v-if="$vuetify.breakpoint.smAndUp" class="text-left">
+                    <b>{{ item.school.name }}</b>
+                    <br />Level:
+                    <b>{{ displayLevel(item.level) }}</b>
+                    <br />Casting time:
                     <b>{{ displayCasting(item) }}</b>
-                    <br />
-                    Range:
+                    <br />Range:
                     <b>{{ displayRange(item) }}</b>
+                    <br />Duration:
+                    <b>{{ item.level }}</b>
                     <br />
-
-                    Duration: <b>{{ item.level }}</b> <br />
                   </v-col>
-                  <v-col class="text-justify">
+                  <v-col
+                    :cols="$vuetify.breakpoint.xs ? '12' : '10'"
+                    class="text-justify"
+                  >
                     <div v-if="$vuetify.breakpoint.xs">
-                      Casting: <b>{{ displayCasting(item) }}</b
-                      >, Range: <b>{{ displayRange(item) }}</b
-                      ><span v-if="item.duration"
-                        >, Duration:
+                      Casting:
+                      <b>{{ displayCasting(item) }}</b
+                      >, Range:
+                      <b>{{ displayRange(item) }}</b>
+                      <span v-if="item.duration">
+                        , Duration:
                         <b>{{ item.duration ? item.duration.name : '' }}</b>
                       </span>
                       <br />
                     </div>
-                    Components: <b>{{ displayComponents(item) }}</b> <br />
+                    Components:
+                    <b>{{ displayComponents(item) }}</b>
+                    <br />
                     <hr />
                     <br />
                     {{ item.description }}
@@ -280,65 +288,69 @@
         <template v-slot:item="{ item, expand, isExpanded }">
           <tr @click="expand(!isExpanded)" style="cursor: pointer;">
             <td
-              class="text-center d-block d-sm-table-cell"
               v-if="$vuetify.breakpoint.smAndUp"
+              class="text-center d-block d-sm-table-cell"
             ></td>
             <td
-              class="text-left d-block d-sm-table-cell"
               :class="{
                 'text-center': $vuetify.breakpoint.xs
               }"
+              class="text-left d-block d-sm-table-cell"
             >
               <div v-if="$vuetify.breakpoint.xs">
-                <span class="font-weight-black text-uppercase">{{
-                  item.name
-                }}</span>
+                <span class="font-weight-black text-uppercase">
+                  {{ item.name }}
+                </span>
                 <br />
-                <span>
-                  {{ item.school.name }}, {{ displayLevel(item.level) }}</span
+                <span
+                  >{{ item.school.name }}, {{ displayLevel(item.level) }}</span
                 >
                 <br />
               </div>
               <span v-else>{{ item.name }}</span>
             </td>
             <td
-              class="text-center d-block d-sm-table-cell"
               v-if="$vuetify.breakpoint.smAndUp"
+              class="text-center d-block d-sm-table-cell"
             >
               <span>{{ displayLevel(item.level) }}</span>
             </td>
             <td
-              class="text-center d-block d-sm-table-cell"
               v-if="$vuetify.breakpoint.smAndUp"
+              class="text-center d-block d-sm-table-cell"
             >
               {{ item.school.name }}
             </td>
             <td
-              class="text-center d-block d-sm-table-cell"
               v-if="$vuetify.breakpoint.smAndUp"
+              class="text-center d-block d-sm-table-cell"
             >
               {{ displayCasting(item) }}
             </td>
             <td
-              class="d-block d-sm-table-cell"
               v-if="$vuetify.breakpoint.smAndUp"
+              class="d-block d-sm-table-cell"
             >
               {{ displayRange(item) }}
             </td>
             <td
-              class="d-block d-sm-table-cell"
               v-if="$vuetify.breakpoint.smAndUp"
+              class="d-block d-sm-table-cell"
             >
-              {{ item.duration ? item.duration.name : '' }}
+              {{
+                item.duration.id == 4 //Time
+                  ? item.durationValue + ' ' + item.durationType.name
+                  : item.duration.name
+              }}
             </td>
             <td
-              class="text-center d-block d-sm-table-cell"
               v-if="$vuetify.breakpoint.smAndUp"
+              class="text-center d-block d-sm-table-cell"
             >
               <div class="tooltip">
                 <span
-                  class="ma-0 v-chip theme--light v-size--x-small white--text"
                   :class="item.isVerbal ? 'blue-grey' : 'grey lighten-2'"
+                  class="ma-0 v-chip theme--light v-size--x-small white--text"
                 >
                   <span class="v-chip__content">
                     <span>V</span>
@@ -349,8 +361,8 @@
 
               <div class="tooltip">
                 <span
-                  class="ma-0 v-chip theme--light v-size--x-small white--text"
                   :class="item.isSomatic ? 'blue-grey' : 'grey lighten-2'"
+                  class="ma-0 v-chip theme--light v-size--x-small white--text"
                 >
                   <span class="v-chip__content">
                     <span>S</span>
@@ -361,42 +373,62 @@
 
               <div class="tooltip">
                 <span
-                  class="ma-0 v-chip theme--light v-size--x-small white--text"
                   :class="item.isMaterial ? 'blue-grey' : 'grey lighten-2'"
+                  class="ma-0 v-chip theme--light v-size--x-small white--text"
                 >
                   <span class="v-chip__content">
                     <span>M</span>
                   </span>
                 </span>
-                <span class="tooltiptext"
-                  >Components{{
-                    item.isMaterial ? ': ' + item.components : ''
-                  }}</span
-                >
+                <span class="tooltiptext">
+                  Components{{ item.isMaterial ? ': ' + item.components : '' }}
+                </span>
               </div>
             </td>
             <td
-              class="text-center d-block d-sm-table-cell"
               v-if="$vuetify.breakpoint.smAndUp"
+              class="text-center d-block d-sm-table-cell"
             >
               {{ item.isRitual ? 'Yes' : 'No' }}
             </td>
             <td
-              class="text-center d-block d-sm-table-cell"
               v-if="$vuetify.breakpoint.smAndUp"
+              class="text-center d-block d-sm-table-cell"
             >
               {{ item.isConcentration ? 'Yes' : 'No' }}
             </td>
             <td
-              class="text-xs-right d-block d-sm-table-cell"
               v-if="$vuetify.breakpoint.smAndUp"
+              class="text-center d-block d-sm-table-cell"
+            >
+              <div
+                v-for="gc in item.gameClasses"
+                :key="gc.shortname"
+                class="tooltip"
+              >
+                <template v-if="gc != null">
+                  <span
+                    class="ma-0 v-chip theme--light v-size--x-small white--text blue-grey"
+                  >
+                    <span class="v-chip__content">
+                      <span>{{ gc.shortName }}</span>
+                    </span>
+                  </span>
+                  <span class="tooltiptext">{{ gc.name }}</span>
+                </template>
+                &nbsp;
+              </div>
+            </td>
+            <td
+              v-if="$vuetify.breakpoint.smAndUp"
+              class="text-xs-right d-block d-sm-table-cell"
             >
               <div class="tooltip">
                 <span
-                  class="ma-0 v-chip theme--light v-size--x-small white--text"
                   :class="
                     item.source.isOfficial ? 'blue-grey' : 'lime darken-4'
                   "
+                  class="ma-0 v-chip theme--light v-size--x-small white--text"
                 >
                   <span class="v-chip__content">
                     <span>{{ item.source.shortName }}</span>
@@ -407,12 +439,18 @@
                 >
               </div>
             </td>
+            <td class="text-xs-right d-block d-sm-table-cell">
+              <!-- <v-btn v-on="on" color="primary" dark class="mb-2" icon
+                >edit</v-btn
+              > -->
+              <v-btn text icon>
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+            </td>
           </tr>
         </template>
 
-        <template v-slot:no-data>
-          Sorry, There is no data do display.
-        </template>
+        <template v-slot:no-data>Sorry, There is no data do display.</template>
       </v-data-table>
     </v-flex>
   </v-layout>
@@ -426,18 +464,13 @@ export default {
   },
   authenticated: true,
   data: () => ({
+    dialog: false,
     editedIndex: -1,
     loading: true,
     expand: false,
-    rarity: null,
-    rarities: [],
     type: '',
     types: [],
-    attunement: false,
-    cursed: false,
-    dialog: false,
     headers: null,
-    items: [],
     filter: {
       items: [],
       name: '',
@@ -458,29 +491,8 @@ export default {
       ranges: [],
       selectedRanges: [],
       schools: [],
-      selectedSchools: []
-    },
-    editedItem: {
-      name: '',
-      level: 0,
-      school: 1,
-      isConcentration: false,
-      isRitual: false,
-      castingValue: null,
-      castingTime: 1,
-      range: 1,
-      rangeDistance: null,
-      rangeMetric: 1,
-      duration: 1,
-      durationValue: null,
-      durationType: null,
-      isVerbal: false,
-      isSomatic: false,
-      isMaterial: false,
-      components: '',
-      source: 0,
-      sourcePage: null,
-      description: ''
+      selectedSchools: [],
+      gameClasses: []
     },
     rules: {
       required: (value) => !!value || 'Required.',
@@ -491,22 +503,14 @@ export default {
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? 'New Spell' : 'Edit Spell'
-    },
-    form() {
-      return {
-        cursed: this.cursed,
-        type: this.type,
-        rarity: this.rarity,
-        description: this.description
-      }
     }
   },
 
-  watch: {
-    dialog(val) {
-      val || this.close()
-    }
-  },
+  // watch: {
+  //   dialog(val) {
+  //     val || this.close()
+  //   }
+  // },
 
   created() {
     this.initialize()
@@ -529,6 +533,7 @@ export default {
         { text: 'Components', value: 'isMaterial', align: 'center' },
         { text: 'Ritual', value: 'isRitual', align: 'center' },
         { text: 'Concentration', value: 'isConcentration', align: 'center' },
+        { text: 'Classes', value: 'gameClasses', align: 'center' },
         { text: 'Source', value: 'source.name', align: 'center' },
         { text: 'Actions', value: 'action', align: 'center', sortable: false }
       ]
@@ -541,6 +546,7 @@ export default {
       this.getSpellDurationTypes()
       this.getSpellRanges()
       this.getSpellSchools()
+      this.getGameClasses()
       this.getData()
       this.headers = this.getHeaders()
     },
@@ -575,57 +581,18 @@ export default {
         this.filter.schools = res.data
       })
     },
-
+    getGameClasses() {
+      this.$http.get('/gameClass/').then((res) => {
+        this.filter.gameClasses = res.data._embedded.gameClass
+      })
+    },
     getData() {
       this.$http.get('/spell/').then((res) => {
-        console.log(res)
-        const returned = res.data._embedded.spell // data.content
+        const returned = res.data._embedded.spell
         this.items = Object.freeze(returned)
         this.filter.items = this.items
         this.loading = false
       })
-    },
-
-    edit(entity) {
-      this.editedIndex = this.items.indexOf(entity)
-      this.editedItem = Object.assign({}, entity)
-      this.dialog = true
-    },
-
-    delete(entity) {
-      const index = this.items.indexOf(entity)
-      confirm('Are you sure you want to delete this item?') &&
-        this.items.splice(index, 1)
-    },
-
-    close() {
-      this.dialog = false
-      setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-      }, 300)
-    },
-
-    save() {
-      if (this.$refs.form.validate()) {
-        if (this.editedIndex > -1) {
-          // console.log('~~~~ Edited Item:')
-          // console.log(JSON.stringify(this.editedItem))
-          Object.assign(this.items[this.editedIndex], this.editedItem)
-        } else {
-          console.log('~~~~ Inserted Item:')
-          console.log(JSON.stringify(this.editedItem))
-          this.$http
-            .post('/spell/', JSON.stringify(this.editedItem), {
-              headers: { 'Content-Type': 'application/json; charset=utf-8' }
-            })
-            .then((res) => {
-              this.getData()
-            })
-            .catch((err) => console.log(err))
-        }
-        this.close()
-      }
     },
 
     doFilter() {
@@ -671,6 +638,13 @@ export default {
             }).length > 0)
         )
       })
+    },
+
+    updateSpellModalShow(show) {
+      this.dialog = show
+      if (!show) {
+        this.getData()
+      }
     },
 
     displayLevel(level) {

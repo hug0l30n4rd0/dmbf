@@ -75,11 +75,11 @@ export default {
           title: 'Welcome',
           to: '/'
         },
-        {
-          icon: 'ra ra-lightning-sword',
-          title: 'Magic Items',
-          to: '/items'
-        },
+        // {
+        //   icon: 'ra ra-lightning-sword',
+        //   title: 'Magic Items',
+        //   to: '/items'
+        // },
         {
           icon: 'ra ra-lightning-trio',
           title: 'Spells',
