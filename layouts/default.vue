@@ -84,6 +84,11 @@ export default {
           icon: 'ra ra-lightning-trio',
           title: 'Spells',
           to: '/spell'
+        },
+        {
+          icon: 'ra ra-fighter',
+          title: 'Character',
+          to: '/character'
         }
       ],
       miniVariant: false,
