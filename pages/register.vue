@@ -85,18 +85,18 @@ export default {
   methods: {
     async register() {
       try {
-        await this.$axios.post('register', {
+        await this.$http.post('/auth/sign-up', {
           username: this.username,
           email: this.email,
           password: this.password
         })
 
-        await this.$auth.loginWith('local', {
-          data: {
-            email: this.email,
-            password: this.password
-          }
-        })
+        // await this.$auth.loginWith('local', {
+        //   data: {
+        //     email: this.email,
+        //     password: this.password
+        //   }
+        // })
 
         this.$router.push('/')
       } catch (e) {

@@ -81,6 +81,11 @@ export default {
         //   to: '/items'
         // },
         {
+          icon: 'mdi mdi-voice',
+          title: 'Languages',
+          to: '/language'
+        },
+        {
           icon: 'ra ra-lightning-trio',
           title: 'Spells',
           to: '/spell'
